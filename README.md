@@ -3,7 +3,9 @@
 [![License][license-src]][license-href]
 [![Cloudflare Workers][workers-src]][workers-href]
 
-A Cloudflare Worker + Workflow service that optionally waits for the latest deployment of a Worker and then `POST`s a Cloudflare deploy hook URL.
+A Cloudflare Worker + Workflow service that optionally waits for the latest deployment of a Worker and then either redeploys another Worker or `POST`s a Cloudflare deploy hook URL.
+
+This supports both Workers Builds deploy hooks and a direct Worker redeploy flow for cases such as static-asset-only Workers where a deploy hook URL is not available.
 
 - ⚙️ Runtime: Cloudflare Workers + Workflows
 - 🧠 Validation: `zod`
@@ -17,7 +19,7 @@ pnpm install
 
 ## Usage
 
-Copy `.env.example` to `.env` and use a user API token with access to the Workers resources needed to inspect the latest deployment while waiting.
+Copy `.env.example` to `.env` and use a user API token with access to the Workers resources needed to inspect deployments and, if you use `cloudflare.to_redeploy.worker`, trigger a rebuild.
 
 ```txt
 CLOUDFLARE_API_TOKEN=...
@@ -29,7 +31,25 @@ Run locally:
 pnpm run dev
 ```
 
-Trigger a deploy hook after another worker deployment is successful:
+Trigger a worker redeploy after another worker deployment is successful:
+
+```txt
+POST /url
+Content-Type: application/json
+
+{
+  "cloudflare": {
+    "to_wait": {
+      "worker": "talks"
+    },
+    "to_redeploy": {
+      "worker": "my-static-worker"
+    }
+  }
+}
+```
+
+Trigger a Cloudflare deploy hook URL after another worker deployment is successful:
 
 ```txt
 POST /url
@@ -45,6 +65,12 @@ Content-Type: application/json
 }
 ```
 
+> [!NOTE]
+> If `cloudflare.to_redeploy.worker` is provided, the worker redeploy path is used. `deploy_hook_url` is only required when you want to trigger a deploy hook instead.
+
+> [!NOTE]
+> `cloudflare.to_redeploy.worker` is useful for Workers that cannot be redeployed through a deploy hook URL, such as static Workers.
+
 Trigger a Cloudflare deploy hook URL immediately without waiting:
 
 ```txt
@@ -56,17 +82,18 @@ Content-Type: application/json
 }
 ```
 
-> [!NOTE]
-> The worker always triggers the target URL with an HTTP `POST`, which matches Cloudflare deploy hooks.
-
-Redeploy immediately without waiting (omit `cloudflare.to_wait` but still provide `deploy_hook_url`):
+Redeploy a worker immediately without waiting:
 
 ```txt
 POST /url
 Content-Type: application/json
 
 {
-  "deploy_hook_url": "https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/abc123"
+  "cloudflare": {
+    "to_redeploy": {
+      "worker": "my-static-worker"
+    }
+  }
 }
 ```
 
@@ -84,7 +111,15 @@ If input is invalid (malformed JSON or schema mismatch), the API returns `400 Ba
 
 When running locally, you can use [HTTPie](https://httpie.io/) to test the API. This is easier than using a GUI like Postman.
 
-Trigger a deploy hook after another worker deployment is successful:
+Trigger a worker redeploy after another worker deployment is successful:
+
+```bash
+http --verbose --json POST localhost:8787/url \
+  cloudflare:='{"to_wait":{"worker":"talks"},"to_redeploy":{"worker":"my-static-worker"}}' \
+  x-service:soubiran.dev
+```
+
+Trigger a deploy hook URL after another worker deployment is successful:
 
 ```bash
 http --verbose --json POST localhost:8787/url \
@@ -101,6 +136,14 @@ http --verbose --json POST localhost:8787/url \
   x-service:soubiran.dev
 ```
 
+Redeploy a worker immediately:
+
+```bash
+http --verbose --json POST localhost:8787/url \
+  cloudflare:='{"to_redeploy":{"worker":"my-static-worker"}}' \
+  x-service:soubiran.dev
+```
+
 > [!NOTE]
 > Remember to use real target names that exist in your Cloudflare account.
 
@@ -110,8 +153,11 @@ Quick negative tests:
 # Wrong route (expect 404)
 http --verbose --json POST localhost:8787/soubiran-dev cloudflare:='{"to_wait":{"worker":"talks"}}'
 
-# Invalid body shape (expect 400)
-http --verbose --json POST localhost:8787/url deploy_hook_url=not-a-url cloudflare:='{"to_wait":{"worker":"talks"}}'
+# Invalid body shape (expect 400: neither trigger target is provided)
+http --verbose --json POST localhost:8787/url cloudflare:='{"to_wait":{"worker":"talks"}}'
+
+# Invalid body shape (expect 400: invalid deploy hook URL)
+http --verbose --json POST localhost:8787/url deploy_hook_url=not-a-url
 
 # Malformed JSON (expect 400)
 echo '{bad json' | http --verbose POST localhost:8787/url Content-Type:application/json
