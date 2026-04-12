@@ -3,9 +3,9 @@ export function getWorkflowId(workerToWait?: string): string {
     return crypto.randomUUID()
   }
 
-  return `worker:${workerToWait}:${crypto.randomUUID()}`
+  return `worker-${workerToWait}-${crypto.randomUUID()}`
 }
 
 export function getWorkflowIdPrefix(workerToWait: string): string {
-  return `worker:${workerToWait}:`
+  return `worker-${workerToWait}-`
 }
