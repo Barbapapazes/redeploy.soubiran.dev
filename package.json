@@ -1,0 +1,23 @@
+{
+  "name": "redeploy.soubiran.dev",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types src/worker-configuration.d.ts",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "dependencies": {
+    "cloudflare": "^5.2.0",
+    "evlog": "^1.10.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^7.4.3",
+    "eslint": "^9.39.2",
+    "taze": "^19.9.2",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.4.0"
+  }
+}

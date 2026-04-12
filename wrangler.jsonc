@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "redeploy-soubiran-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-02-20",
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "invocation_logs": false
+    }
+  },
+  "routes": [
+    {
+      "pattern": "redeploy.soubiran.dev",
+      "zone_name": "soubiran.dev",
+      "custom_domain": true
+    }
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "workflows": [
+    {
+      "binding": "REDEPLOY_SOUBIRAN_DEV",
+      "name": "redeploy-soubiran-dev",
+      "class_name": "RedeploySoubiranDev"
+    }
+  ]
+}
