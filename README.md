@@ -7,7 +7,7 @@ A Cloudflare Worker + Workflow service that optionally waits for the latest depl
 
 - ⚙️ Runtime: Cloudflare Workers + Workflows
 - 🧠 Validation: `zod`
-- 🪵 Logging: `evlog/workers`
+- 🪵 Logging: `evlog/workers` in the Worker + `evlog` wide events in the Workflow
 
 ## Installation
 
@@ -30,6 +30,13 @@ pnpm run dev
 ```
 
 ## Usage
+
+Every request emits a Worker log event, and every workflow execution emits its own wide event. To make events easy to identify and correlate:
+
+- send `x-service` when calling the Worker
+- the Worker logs the caller service and generated workflow id
+- the Workflow log includes the originating request id and caller service
+- deploy hook URLs are sanitized in logs so the secret hook token is not exposed
 
 Trigger a Cloudflare deploy hook URL after another worker deployment is successful:
 
@@ -59,6 +66,8 @@ Content-Type: application/json
 ```
 
 If input is invalid (malformed JSON or schema mismatch), the API returns `400 Bad Request`.
+
+If workflow execution fails later, the workflow run emits its own error event with the workflow instance id and Cloudflare deployment context when available.
 
 ## Development
 
