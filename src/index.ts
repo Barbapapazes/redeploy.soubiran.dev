@@ -7,7 +7,7 @@ import { cloudflare } from './cloudflare'
 import { ACCOUNT_ID, WORKFLOW_NAME } from './constants'
 import { bodySchema } from './schema'
 import { getWorkflowId, getWorkflowIdPrefix } from './utils'
-import { redeployWorker, waitForLatestWorkersDeployment } from './workers'
+import { waitForLatestWorkersDeployment } from './workers'
 
 initWorkersLogger({
   env: { service: 'redeploy-soubiran-dev' },
@@ -45,13 +45,11 @@ export default {
 
       const deployHookUrl = validatedBody.data.deploy_hook_url
       const workerToWait = validatedBody.data.cloudflare?.to_wait?.worker
-      const workerToRedeploy = validatedBody.data.cloudflare?.to_redeploy?.worker
 
       const workflowId = getWorkflowId(workerToWait)
       const params = {
         deploy_hook_url: deployHookUrl,
         workerToWait,
-        workerToRedeploy,
       }
       log.set({ workflow: { params, id: workflowId } })
 
@@ -70,18 +68,13 @@ export default {
 }
 
 interface RedeploySoubiranDevPayload {
-  deploy_hook_url?: string
+  deploy_hook_url: string
   workerToWait?: string
-  workerToRedeploy?: string
 }
 
 export class RedeploySoubiranDev extends WorkflowEntrypoint<Env, RedeploySoubiranDevPayload> {
   async run(event: Readonly<WorkflowEvent<RedeploySoubiranDevPayload>>, step: WorkflowStep) {
-    const { deploy_hook_url, workerToWait, workerToRedeploy } = event.payload
-
-    if (!deploy_hook_url && !workerToRedeploy) {
-      throw new NonRetryableError('No deploy hook URL or worker specified to redeploy')
-    }
+    const { deploy_hook_url, workerToWait } = event.payload
 
     if (workerToWait) {
       await step.do(`check-if-workflow-exists-${workerToWait}`, async () => {
@@ -113,12 +106,7 @@ export class RedeploySoubiranDev extends WorkflowEntrypoint<Env, RedeploySoubira
       })
     }
 
-    await step.do(`trigger-${workerToRedeploy ?? 'deploy-hook'}`, async () => {
-      if (workerToRedeploy) {
-        await redeployWorker(workerToRedeploy)
-        return
-      }
-
+    await step.do('trigger-deploy-hook', async () => {
       if (!deploy_hook_url) {
         throw new NonRetryableError('No deploy hook URL specified')
       }
