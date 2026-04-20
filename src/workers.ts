@@ -24,9 +24,9 @@ export async function waitForLatestWorkersDeployment(workerToWait: string): Prom
     return // Not every worker version has an associated build (for example manual deployments)
   }
 
-  if (build.status === 'success') {
+  if (build.build_outcome === 'success') {
     return
   }
 
-  throw new Error(`Latest production deployment for worker ${workerToWait} is not successful yet. Current status: ${build.status}`)
+  throw new Error(`Latest production deployment for worker ${workerToWait} is not successful yet. Current status: ${build.build_outcome}`)
 }

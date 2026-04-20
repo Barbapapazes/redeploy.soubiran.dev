@@ -2,7 +2,7 @@ export interface BuildInfo {
   result: {
     builds: {
       [versionId: string]: {
-        status: 'queued' | 'in_progress' | 'success' | 'failure' | 'canceled'
+        build_outcome: 'success' | 'fail' | 'skipped' | 'cancelled' | 'terminated'
         trigger: {
           trigger_uuid: string
         }
