@@ -19,6 +19,6 @@
     "eslint": "^10.2.0",
     "taze": "^19.11.0",
     "typescript": "^6.0.3",
-    "wrangler": "^4.82.2"
+    "wrangler": "^4.84.0"
   }
 }
