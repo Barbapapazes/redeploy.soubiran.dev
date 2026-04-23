@@ -1,9 +1,9 @@
 {
-	"servers": {
-		"cloudflare-api": {
-			"url": "https://mcp.cloudflare.com/mcp",
-			"type": "http"
-		}
-	},
-	"inputs": []
+  "servers": {
+    "cloudflare-api": {
+      "url": "https://mcp.cloudflare.com/mcp",
+      "type": "http"
+    }
+  },
+  "inputs": []
 }
