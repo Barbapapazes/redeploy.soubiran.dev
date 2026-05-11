@@ -10,7 +10,7 @@
     "lint:fix": "eslint --fix"
   },
   "dependencies": {
-    "cloudflare": "^5.2.0",
+    "cloudflare": "^6.1.0",
     "evlog": "^2.13.0",
     "zod": "^4.3.6"
   },

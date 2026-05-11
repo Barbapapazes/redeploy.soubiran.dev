@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       cloudflare:
-        specifier: ^5.2.0
-        version: 5.2.0
+        specifier: ^6.1.0
+        version: 6.1.0
       evlog:
         specifier: ^2.13.0
         version: 2.13.0(ofetch@1.5.1)
@@ -850,8 +850,8 @@ packages:
     resolution: {integrity: sha512-GfisEZEJvzKrmGWkvfhgzcz/BllN1USeqD2V6tg14OAOgaCD2Z/PUEuxnAZ/nPvmaHRG7a8y77p1T/IRQ4D1Hw==}
     engines: {node: '>=4'}
 
-  cloudflare@5.2.0:
-    resolution: {integrity: sha512-dVzqDpPFYR9ApEC9e+JJshFJZXcw4HzM8W+3DHzO5oy9+8rLC53G7x6fEf9A7/gSuSCxuvndzui5qJKftfIM9A==}
+  cloudflare@6.1.0:
+    resolution: {integrity: sha512-4hVKiowaEjRoYOFRj8/2bSaj4sQl4GUO/XnzV5OEnjvaYz+MWQOqs3KX6nlbix98JF2iSS/MZrIjbz9C+hkEaQ==}
 
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
@@ -2723,7 +2723,7 @@ snapshots:
     dependencies:
       escape-string-regexp: 1.0.5
 
-  cloudflare@5.2.0:
+  cloudflare@6.1.0:
     dependencies:
       '@types/node': 18.19.130
       '@types/node-fetch': 2.6.13
