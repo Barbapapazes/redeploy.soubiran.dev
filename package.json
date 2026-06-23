@@ -1,7 +1,7 @@
 {
   "name": "redeploy.soubiran.dev",
   "type": "module",
-  "packageManager": "pnpm@10.34.1",
+  "packageManager": "pnpm@10.34.3",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
@@ -11,14 +11,14 @@
   },
   "dependencies": {
     "cloudflare": "^5.2.0",
-    "evlog": "^2.18.1",
+    "evlog": "^2.19.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^8.3.0",
-    "eslint": "^10.4.1",
+    "eslint": "^10.5.0",
     "taze": "^19.14.1",
     "typescript": "^6.0.3",
-    "wrangler": "^4.98.0"
+    "wrangler": "^4.101.0"
   }
 }
