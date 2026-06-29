@@ -1,7 +1,7 @@
 {
   "name": "redeploy.soubiran.dev",
   "type": "module",
-  "packageManager": "pnpm@10.34.3",
+  "packageManager": "pnpm@10.34.4",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
@@ -19,6 +19,6 @@
     "eslint": "^10.5.0",
     "taze": "^19.14.1",
     "typescript": "^6.0.3",
-    "wrangler": "^4.101.0"
+    "wrangler": "^4.103.0"
   }
 }
