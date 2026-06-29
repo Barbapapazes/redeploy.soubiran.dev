@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "cloudflare": "^5.2.0",
-    "evlog": "^2.19.1",
+    "evlog": "^2.19.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -12,7 +12,7 @@ importers:
         specifier: ^5.2.0
         version: 5.2.0
       evlog:
-        specifier: ^2.19.1
+        specifier: ^2.19.2
         version: 2.19.2(ofetch@1.5.1)
       zod:
         specifier: ^4.4.3
