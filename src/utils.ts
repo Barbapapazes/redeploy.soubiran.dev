@@ -1,13 +1,23 @@
-export function getWorkflowId(workerToWait?: string): string {
+export async function getDeployHookUrlHash(deployHookUrl: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(deployHookUrl))
+  return Array.from(new Uint8Array(digest))
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 16)
+}
+
+export async function getWorkflowId(workerToWait: string | undefined, deployHookUrl: string): Promise<string> {
   if (!workerToWait) {
     return crypto.randomUUID()
   }
 
-  return `worker-${workerToWait}-${crypto.randomUUID()}`
+  const deployHookUrlHash = await getDeployHookUrlHash(deployHookUrl)
+  return `worker-${workerToWait}-hook-${deployHookUrlHash}-${crypto.randomUUID()}`
 }
 
-export function getWorkflowIdPrefix(workerToWait: string): string {
-  return `worker-${workerToWait}-`
+export async function getWorkflowIdPrefix(workerToWait: string, deployHookUrl: string): Promise<string> {
+  const deployHookUrlHash = await getDeployHookUrlHash(deployHookUrl)
+  return `worker-${workerToWait}-hook-${deployHookUrlHash}-`
 }
 
 export function getDeployHookLogContext(deployHookUrl: string): { host: string, pathname: string } {

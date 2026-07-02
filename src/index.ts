@@ -72,7 +72,7 @@ export default {
         const deployHookUrl = validatedBody.data.deploy_hook_url
         const workerToWait = validatedBody.data.cloudflare?.to_wait?.worker
 
-        const workflowId = getWorkflowId(workerToWait)
+        const workflowId = await getWorkflowId(workerToWait, deployHookUrl)
         const params = {
           deploy_hook_url: deployHookUrl,
           workerToWait,
@@ -183,11 +183,11 @@ export class RedeploySoubiranDev extends WorkflowEntrypoint<Env, RedeploySoubira
             status: 'running',
           })
 
-          const workflowIdPrefix = getWorkflowIdPrefix(workerToWait)
+          const workflowIdPrefix = await getWorkflowIdPrefix(workerToWait, deploy_hook_url)
 
           const otherInstances = json.result
             .filter(instance => instance.id !== event.instanceId) // Remove itself from the list
-            .filter(instance => instance.id.startsWith(workflowIdPrefix)) // Keep only instances related to the same target to wait for
+            .filter(instance => instance.id.startsWith(workflowIdPrefix)) // Keep only instances related to the same target and deploy hook to wait for
 
           if (otherInstances.length > 0) {
             throw new NonRetryableError(`Another instance of ${WORKFLOW_NAME} is already running for worker ${workerToWait}. Instance ID: ${otherInstances[0].id}`)
