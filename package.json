@@ -11,14 +11,14 @@
   },
   "dependencies": {
     "cloudflare": "^5.2.0",
-    "evlog": "^2.19.1",
+    "evlog": "^2.19.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^8.3.0",
-    "eslint": "^10.5.0",
+    "eslint": "^10.6.0",
     "taze": "^19.14.1",
     "typescript": "^6.0.3",
-    "wrangler": "^4.103.0"
+    "wrangler": "^4.105.0"
   }
 }
