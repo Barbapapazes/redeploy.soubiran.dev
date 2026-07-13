@@ -12,8 +12,8 @@ importers:
         specifier: ^5.2.0
         version: 5.2.0
       evlog:
-        specifier: ^2.19.2
-        version: 2.19.2(ofetch@1.5.1)
+        specifier: ^2.20.0
+        version: 2.20.0(ofetch@1.5.1)
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -31,7 +31,7 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
       wrangler:
-        specifier: ^4.105.0
+        specifier: ^4.107.0
         version: 4.107.0
 
 packages:
@@ -1241,16 +1241,17 @@ packages:
     resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
     engines: {node: '>=6'}
 
-  evlog@2.19.2:
-    resolution: {integrity: sha512-6a8ynL4tKhYK8p+mQv0in1tv3EUDSPvVPAWAuDRlpXTTIoLsR1Nol9dRIqhowakTP9XGNk6atSpvupTTGQDOTA==}
+  evlog@2.20.0:
+    resolution: {integrity: sha512-S4r1+uHKRJg/1AH7LYHjuBAOJpe6Pdf3n9bb1lrIzeNNYzi4dvycrS+regpyriaalx69+IL6vB3OnPN7e7DVLw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@nestjs/common': '>=11.1.19'
       '@nuxt/kit': ^4.4.2
       '@orpc/server': '>=1.14.0'
       '@tanstack/start-client-core': ^1.167.20
-      ai: '>=6.0.168'
+      ai: '>=6.0.168 <8.0.0'
       elysia: '>=1.4.28'
+      eve: '>=0.12.0'
       express: '>=5.2.1'
       fastify: '>=5.8.5'
       h3: ^1.15.11
@@ -1274,6 +1275,8 @@ packages:
       ai:
         optional: true
       elysia:
+        optional: true
+      eve:
         optional: true
       express:
         optional: true
@@ -3249,7 +3252,7 @@ snapshots:
 
   event-target-shim@5.0.1: {}
 
-  evlog@2.19.2(ofetch@1.5.1):
+  evlog@2.20.0(ofetch@1.5.1):
     optionalDependencies:
       ofetch: 1.5.1
 
