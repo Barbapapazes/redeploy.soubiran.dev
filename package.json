@@ -17,7 +17,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^8.3.0",
     "eslint": "^10.8.0",
-    "taze": "^19.17.0",
+    "taze": "^19.17.1",
     "typescript": "^6.0.3",
     "wrangler": "^4.118.0"
   }
