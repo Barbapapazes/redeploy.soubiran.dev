@@ -12,7 +12,7 @@ function env(dsn = ''): Env {
     SENTRY_ENVIRONMENT: 'test',
     CLOUDFLARE_API_TOKEN: '',
     REDEPLOY_SOUBIRAN_DEV: {} as Env['REDEPLOY_SOUBIRAN_DEV'],
-  }
+  } as Env // Exercise local overrides of the configuration's literal text types.
 }
 
 describe('telemetry privacy', () => {
