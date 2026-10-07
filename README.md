@@ -26,7 +26,7 @@ If you use `cloudflare.to_wait.worker`, provide a user API token with access to 
 CLOUDFLARE_API_TOKEN=...
 ```
 
-`CLOUDFLARE_API_TOKEN` in this file is the **Worker's runtime token**. It is separate from the credentials Wrangler uses to deploy the service. The required-secret declaration makes its type reproducible; local development warns if it is missing, but the immediate redeploy path does not use it.
+`CLOUDFLARE_API_TOKEN` in this file is the **Worker's runtime token**. It is separate from the credentials `cf` uses to deploy the service. The `bindings.secret()` declaration makes its type reproducible; the immediate redeploy path does not use it.
 
 Run locally:
 
@@ -78,7 +78,7 @@ If workflow execution fails later, the workflow run emits its own error event wi
 
 The existing evlog wide events stay in Cloudflare Workers Logs. **There is no evlog drain to Sentry.** Sentry console capture and Sentry Logs are disabled, so evlog output is not forwarded indirectly either.
 
-To enable Sentry locally, set `SENTRY_DSN` in `.dev.vars`. Leave it empty to disable Sentry. For production, set the public project DSN in `wrangler.jsonc` (`vars.SENTRY_DSN`) before deploying. `SENTRY_ENVIRONMENT` defaults to `production` and is overridden to `development` in the local example.
+To enable Sentry locally, set `SENTRY_DSN` in `.dev.vars`. Leave it empty to disable Sentry. For production, set the public project DSN in `cloudflare.config.ts` (`worker.env.SENTRY_DSN`, using `bindings.text(...)`) before deploying. `SENTRY_ENVIRONMENT` defaults to `production` and is overridden to `development` in the local example.
 
 The Sentry SDK wraps both the HTTP handler and the named Workflow export. It handles request delivery with `waitUntil` and flushes Workflow telemetry around steps. Workflow step errors are captured by the SDK (rather than manually capturing the same errors again). HTTP errors and Workflow events carry the workflow id for correlation with evlog. Malformed input still returns `400`, not an exception reported to Sentry.
 
@@ -92,23 +92,34 @@ The Vite build emits source maps for debugging. Uploading these maps to Sentry i
 - Dev (workerd runtime, port 8787): `pnpm run dev`
 - Regenerate worker types after binding/config changes: `pnpm run cf-typegen`
 - Lint: `pnpm run lint`
-- Typecheck: `pnpm run typecheck`
+- Typecheck (after type generation): `pnpm run typecheck`
 - Unit tests (one worker): `pnpm run test`
 - Build: `pnpm run build`
 - Preview the built Worker locally: `pnpm run preview`
 - Deploy: `pnpm run deploy`
 
-The deploy command builds first. The Cloudflare Vite plugin writes the deployable Worker/config into `dist/` and creates Wrangler's generated-config redirect in `.wrangler/deploy/config.json`. Wrangler then deploys that **built output**, not the original TypeScript entrypoint. Do not run a plain `wrangler deploy` from a fresh checkout without building first.
+This project uses the new [Cloudflare `cf` CLI](https://blog.cloudflare.com/cloudflare-cf-cli-launch/), pinned to the latest beta at migration time (`1.0.0-beta.13`). `cloudflare.config.ts` is the source of truth for Worker configuration, including the named Workflow export and its binding. `cf dev` starts Vite, `cf build` builds with the Cloudflare Vite plugin, and `cf deploy` builds by default before uploading. Wrangler remains a Vite-plugin dependency, not the user-facing CLI.
 
-Provision the runtime Cloudflare token without committing it:
+The plugin enables `experimental.newConfig` and `cfBuildOutput` to emit standardized Build Output in `.cloudflare/output/v0/`. To validate or deploy a previously built artifact:
 
 ```bash
-pnpm exec wrangler secret put CLOUDFLARE_API_TOKEN
+pnpm exec cf deploy --prebuilt --dry-run
+pnpm exec cf deploy --prebuilt
 ```
+
+Worker types are generated into `.cloudflare/types/index.d.ts` and ignored by Git. Run `pnpm run cf-typegen` after installing dependencies and whenever bindings/config change. CI does this before typechecking.
+
+Authenticate deployment tooling with `pnpm exec cf auth login`, or provide deployment credentials through your CI environment. To provision the separate runtime token at deployment, create a local `.secrets.env` containing only `CLOUDFLARE_API_TOKEN=...` (this file is gitignored), then run:
+
+```bash
+pnpm exec cf deploy --secrets-file .secrets.env
+```
+
+Do not pass `.dev.vars` as the secrets file: it also contains non-secret local Sentry settings. Never put a real token in `cloudflare.config.ts`.
 
 The Workflow name, binding, class export and custom domain are unchanged. `nodejs_compat` is enabled for Sentry's async context handling; the existing compatibility date is retained.
 
-CI regenerates Worker types, lints, typechecks, runs unit tests, builds with Vite and performs a Wrangler deployment dry run. No Cloudflare credentials or Sentry DSN are needed for CI. Unit tests mock platform entrypoints; CI's build/dry run validates bundling, while real Workflow retry/replay behavior still needs a Cloudflare staging smoke test.
+CI regenerates Worker types with `cf workers types`, lints, typechecks, runs unit tests, builds with `cf build` and performs a `cf deploy --prebuilt --dry-run`. No Cloudflare credentials or Sentry DSN are needed for CI. Unit tests mock platform entrypoints; CI's build/dry run validates bundling, while real Workflow retry/replay behavior still needs a Cloudflare staging smoke test.
 
 ## HTTPie examples (development)
 

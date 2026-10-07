@@ -3,13 +3,13 @@
   "type": "module",
   "packageManager": "pnpm@10.34.5",
   "scripts": {
-    "dev": "vite --port 8787",
-    "build": "vite build",
+    "dev": "cf dev",
+    "build": "cf build",
     "preview": "vite preview --port 8787",
-    "deploy": "pnpm run build && wrangler deploy",
+    "deploy": "cf deploy",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "cf-typegen": "wrangler types src/worker-configuration.d.ts --strict-vars=false",
+    "cf-typegen": "cf workers types",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
   },
@@ -22,6 +22,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^8.3.0",
     "@cloudflare/vite-plugin": "^1.63.0",
+    "cf": "1.0.0-beta.13",
     "eslint": "^10.11.0",
     "taze": "^19.17.2",
     "typescript": "^6.0.3",

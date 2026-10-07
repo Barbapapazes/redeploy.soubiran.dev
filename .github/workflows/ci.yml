@@ -29,9 +29,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: worker-types
-          path: src/worker-configuration.d.ts
+          path: .cloudflare/types/index.d.ts
+          include-hidden-files: true
       - run: pnpm run lint
       - run: pnpm run typecheck
       - run: pnpm run test
       - run: pnpm run build
-      - run: pnpm exec wrangler deploy --dry-run
+      - run: pnpm exec cf deploy --prebuilt --dry-run

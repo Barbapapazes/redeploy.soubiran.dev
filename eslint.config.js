@@ -1,5 +1,5 @@
 import antfu from '@antfu/eslint-config'
 
 export default antfu({
-  ignores: ['src/worker-configuration.d.ts'],
+  ignores: ['.cloudflare/**'],
 })
