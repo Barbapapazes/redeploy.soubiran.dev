@@ -28,7 +28,7 @@ describe('telemetry privacy', () => {
       request: {
         url: 'https://redeploy.soubiran.dev/url?secret=query',
         data: { deploy_hook_url: hook },
-        cookies: 'session=secret',
+        cookies: { session: 'secret' },
         headers: { authorization: 'Bearer secret' },
         query_string: 'secret=query',
       },
@@ -41,8 +41,9 @@ describe('telemetry privacy', () => {
     expect(getSentryOptions(env()).enabled).toBe(false)
     const options = getSentryOptions(env('https://public@example.com/1'))
     expect(options.enabled).toBe(true)
-    expect(options.enableLogs).toBe(false)
-    expect(options.sendDefaultPii).toBe(false)
+    expect(options.beforeSendLog?.({} as never)).toBeNull()
+    expect(options.dataCollection?.userInfo).toBe(false)
+    expect(options.dataCollection?.httpBodies).toEqual([])
     expect(options.beforeSend).toBe(sanitizeSentryEvent)
     expect(options.beforeSendTransaction).toBe(sanitizeSentryEvent)
   })
