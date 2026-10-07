@@ -6,6 +6,8 @@ declare namespace Cloudflare {
 		mainModule: typeof import("./index");
 	}
 	interface Env {
+		SENTRY_DSN: string;
+		SENTRY_ENVIRONMENT: string;
 		CLOUDFLARE_API_TOKEN: string;
 		REDEPLOY_SOUBIRAN_DEV: Workflow<Parameters<import("./index").RedeploySoubiranDev['run']>[0]['payload']>;
 	}

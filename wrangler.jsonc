@@ -3,6 +3,14 @@
   "name": "redeploy-soubiran-dev",
   "main": "src/index.ts",
   "compatibility_date": "2026-02-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "secrets": {
+    "required": ["CLOUDFLARE_API_TOKEN"]
+  },
+  "vars": {
+    "SENTRY_DSN": "",
+    "SENTRY_ENVIRONMENT": "production"
+  },
   "observability": {
     "enabled": true,
     "logs": {

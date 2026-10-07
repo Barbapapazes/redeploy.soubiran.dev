@@ -1,0 +1,6 @@
+# Only needed when waiting for another Worker deployment.
+CLOUDFLARE_API_TOKEN=
+
+# Optional: leave empty to disable Sentry locally.
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=development
