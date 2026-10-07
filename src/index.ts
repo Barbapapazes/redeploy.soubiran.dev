@@ -277,4 +277,5 @@ class RedeploySoubiranDevWorkflow extends WorkflowEntrypoint<Env, RedeploySoubir
 // Preserve the named export used by the Wrangler Workflow binding.
 export const RedeploySoubiranDev = instrumentWorkflowWithSentry(getSentryOptions, RedeploySoubiranDevWorkflow)
 // Wrangler typegen refers to named Workflow exports in the type namespace.
+// eslint-disable-next-line ts/no-redeclare
 export type RedeploySoubiranDev = InstanceType<typeof RedeploySoubiranDev>

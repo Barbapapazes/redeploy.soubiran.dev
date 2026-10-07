@@ -50,7 +50,7 @@ describe('telemetry privacy', () => {
   it('does not capture evlog console output or secret outbound URLs', () => {
     const options = getSentryOptions(env())
     if (typeof options.integrations !== 'function') {
-      throw new Error('Expected an integration filter')
+      throw new TypeError('Expected an integration filter')
     }
     expect(options.integrations([
       { name: 'Console' },

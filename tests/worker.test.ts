@@ -61,7 +61,7 @@ async function runWorkflow(workerToWait?: string) {
   return workflow.run(event, step)
 }
 
-describe('Worker', () => {
+describe('worker', () => {
   it('instruments HTTP and Workflow entrypoints', () => {
     expect(httpInstrumentation[0]).toBeTypeOf('function')
     expect(httpInstrumentation[1]).toBe(worker)
@@ -98,7 +98,7 @@ describe('Worker', () => {
   })
 })
 
-describe('Workflow', () => {
+describe('workflow', () => {
   it('triggers a deploy hook immediately', async () => {
     const fetch = vi.fn().mockResolvedValue(new Response('', { status: 200 }))
     vi.stubGlobal('fetch', fetch)

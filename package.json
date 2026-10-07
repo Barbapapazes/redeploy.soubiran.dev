@@ -14,8 +14,8 @@
     "lint:fix": "eslint --fix"
   },
   "dependencies": {
-    "cloudflare": "^5.2.0",
     "@sentry/cloudflare": "^11.5.0",
+    "cloudflare": "^5.2.0",
     "evlog": "^2.30.1",
     "zod": "^4.6.5"
   },
