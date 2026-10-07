@@ -1,4 +1,5 @@
 import type { WorkflowEvent, WorkflowStep } from 'cloudflare:workers'
+import { instrumentWorkflowWithSentry, setContext, setTag, withSentry } from '@sentry/cloudflare'
 import { WorkflowEntrypoint } from 'cloudflare:workers'
 import { NonRetryableError } from 'cloudflare:workflows'
 import { createRequestLogger } from 'evlog'
@@ -7,6 +8,7 @@ import z from 'zod'
 import { cloudflare } from './cloudflare'
 import { ACCOUNT_ID, WORKFLOW_NAME } from './constants'
 import { bodySchema } from './schema'
+import { getSentryOptions } from './sentry'
 import { getDeployHookLogContext, getWorkflowId, getWorkflowIdPrefix, toError } from './utils'
 import { waitForLatestWorkersDeployment } from './workers'
 
@@ -14,13 +16,14 @@ initWorkersLogger({
   env: { service: 'redeploy-soubiran-dev' },
 })
 
-export default {
-  fetch: async (request: Request, env: Env) => {
+export default withSentry(getSentryOptions, {
+  fetch: async (request: Request, env: Env, ctx: ExecutionContext) => {
     const url = new URL(request.url)
     const callerService = request.headers.get('x-service') ?? undefined
 
     const log = createWorkersLogger(request, {
       headers: ['x-service'],
+      executionCtx: ctx,
     })
     const requestContext = log.getContext()
     const requestId = typeof requestContext.requestId === 'string' ? requestContext.requestId : undefined
@@ -73,6 +76,10 @@ export default {
         const workerToWait = validatedBody.data.cloudflare?.to_wait?.worker
 
         const workflowId = await getWorkflowId(workerToWait, deployHookUrl)
+        setTag('workflow.id', workflowId)
+        if (requestId) {
+          setTag('request.id', requestId)
+        }
         const params = {
           deploy_hook_url: deployHookUrl,
           workerToWait,
@@ -125,7 +132,7 @@ export default {
     log.emit({ status: 404 })
     return new Response('Not Found', { status: 404 })
   },
-}
+})
 
 interface RedeploySoubiranDevPayload {
   deploy_hook_url: string
@@ -134,9 +141,17 @@ interface RedeploySoubiranDevPayload {
   triggerRequestId?: string
 }
 
-export class RedeploySoubiranDev extends WorkflowEntrypoint<Env, RedeploySoubiranDevPayload> {
+class RedeploySoubiranDevWorkflow extends WorkflowEntrypoint<Env, RedeploySoubiranDevPayload> {
   async run(event: Readonly<WorkflowEvent<RedeploySoubiranDevPayload>>, step: WorkflowStep) {
     const { deploy_hook_url, requestedByService, triggerRequestId, workerToWait } = event.payload
+
+    setTag('workflow.id', event.instanceId)
+    setContext('workflow', {
+      name: WORKFLOW_NAME,
+      id: event.instanceId,
+      triggerRequestId,
+      worker: workerToWait,
+    })
 
     const workflowLog = createRequestLogger({
       method: 'WORKFLOW',
@@ -217,11 +232,18 @@ export class RedeploySoubiranDev extends WorkflowEntrypoint<Env, RedeploySoubira
           throw new NonRetryableError('No deploy hook URL specified')
         }
 
-        const response = await fetch(deploy_hook_url, { method: 'POST' })
+        let response: Response
+        try {
+          response = await fetch(deploy_hook_url, { method: 'POST' })
+        }
+        catch {
+          // Fetch errors can contain the full URL. Don't log the secret hook.
+          throw new Error('Deploy hook request failed')
+        }
 
         if (!response.ok) {
-          const error = await response.text()
-          throw new Error(`Deploy hook trigger failed with ${response.status}${error ? `: ${error}` : ''}`)
+          // Upstream response bodies can also echo the hook token.
+          throw new Error(`Deploy hook trigger failed with ${response.status}`)
         }
 
         return {
@@ -251,3 +273,6 @@ export class RedeploySoubiranDev extends WorkflowEntrypoint<Env, RedeploySoubira
     }
   }
 }
+
+// Preserve the named export used by the Workflow binding.
+export const RedeploySoubiranDev = instrumentWorkflowWithSentry(getSentryOptions, RedeploySoubiranDevWorkflow)

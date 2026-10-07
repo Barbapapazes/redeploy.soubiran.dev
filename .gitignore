@@ -6,9 +6,11 @@ dist/
 .idea/shelf
 node_modules/
 .wrangler
+.cloudflare/
 .env
 .env.production
 .dev.vars
+.secrets.env
 logs/
 *.log
 npm-debug.log*

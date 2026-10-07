@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -13,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -24,4 +25,14 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run cf-typegen
+      - uses: actions/upload-artifact@v4
+        with:
+          name: worker-types
+          path: .cloudflare/types/index.d.ts
+          include-hidden-files: true
       - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run test
+      - run: pnpm run build
+      - run: pnpm exec cf deploy --prebuilt --dry-run
