@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "cloudflare": "^5.2.0",
-    "evlog": "^2.33.1",
+    "evlog": "^2.34.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -19,6 +19,6 @@
     "eslint": "^10.13.0",
     "taze": "^19.17.2",
     "typescript": "^6.0.3",
-    "wrangler": "^4.152.0"
+    "wrangler": "^4.153.0"
   }
 }
